@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # PROVIDE: ttrss
-# REQUIRE: NETWORKING 
+# REQUIRE: NETWORKING
 # REQUIRE: DAEMON mysql
 # BEFORE: LOGIN
 # KEYWORD: shutdown
@@ -36,36 +36,64 @@
 name=ttrss
 rcvar=`set_rcvar`
 phpexec=`which php`
-start_precmd="${name}_precmd"
+start_precmd="${name}_prestart"
 start_cmd="${name}_start"
+stop_cmd="${name}_stopcmd"
 stop_postcmd="${name}_cleanup"
-load_rc_config ${name}
 
-: ${ttrss_user:="ttrss"}
+: ${ttrss_user:="root"}
+: ${ttrss_cmd_user:="ttrss"}
 : ${ttrss_dir:="/usr/local/www/apache24/data/tt-rss"}
 : ${ttrss_pid:="/var/run/ttrss.pid"}
+: ${ttrss_log:="/var/log/ttrss-log"}
+: ${ttrss_enable:="NO"}
 
-command=${phpexec}
-standalone=${ttrss_dir}/update_daemon2.php
+command_args=${ttrss_dir}/update_daemon2.php
+command=/usr/sbin/daemon
+procname=${name}
+pidfile=${ttrss_pid}
+required_files="${ttrss_dir}/update_daemon2.php"
 
-ttrss_precmd()
+ttrss_prestart()
 {
-	if [ -f ${ttrss_dir}/lock/update_daemon.lock ]; then
-		rm -rf ${ttrss_dir}/lock/update_daemon*.lock
-	fi
-	touch /var/log/ttrss-log
+	touch ${ttrss_log} && chown ${ttrss_cmd_user} ${ttrss_log}
+	touch ${ttrss_pid} && chown ${ttrss_cmd_user} ${ttrss_pid}
 }
 
 ttrss_start()
 {
 	echo "Starting ttrss-update-daemon"
-	touch ${ttrss_pid} && chown ${ttrss_user} ${ttrss_pid}
-	exec /usr/sbin/daemon -c -p ${ttrss_pid} -u ${ttrss_user} ${standalone} > /var/log/ttrss-log
+	exec ${command} -c -t ${name} -P ${ttrss_pid} -u ${ttrss_cmd_user} ${phpexec} ${command_args} > ${ttrss_log}
+}
+
+ttrss_stopcmd()
+{
+	if [ -f "${ttrss_pid}" ] && (pgrep -F ${ttrss_pid} daemon > /dev/null); then
+		main_pid=$(cat ${ttrss_pid});
+		child_pids=$(pgrep -P ${main_pid});
+		grandchild_pids=$(pgrep -P ${child_pids});
+		all_pids="${main_pid} ${child_pids}";
+		all_pids_with_grandchildren="${main_pid} ${child_pids} ${grandchild_pids}";
+		kill ${all_pids};
+		wait_for_pids ${all_pids_with_grandchildren};
+		rm -rf ${ttrss_pid};
+	else
+		echo "${name} is not running.";
+		exit 1;
+	fi
 }
 
 ttrss_cleanup()
 {
-	[ -f ${ttrss_pid} ] && rm ${ttrss_pid}
+	echo "Cleaning up after ttrss-update-daemon..."
+	if [ -f ${ttrss_pid} ]; then
+		rm -rf ${ttrss_pid}
+	fi
+	if [ -f ${ttrss_dir}/lock/update_daemon.lock ]; then
+		rm -rf ${ttrss_dir}/lock/update_daemon*.lock
+	fi
+	echo "RC-TTRSS: All done"
 }
 
+load_rc_config ${name}
 run_rc_command "$1"
