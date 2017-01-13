@@ -42,10 +42,10 @@ Goodbye!
 # fetch https://github.com/Zerotronic/rc-ttrss/raw/master/ttrss
 # mv ttrss /usr/local/etc/rc.d/
 # chown root:wheel /usr/local/etc/rc.d/ttrss
-# chmod 755 /usr/local/etc/rc.d/ttrss
+# chmod 755 /usr/local/etc/rc.d/ttrss && chmod ug+x /usr/local/etc/rc.d/ttrss
 ```
 
-3. Enable the service in `/etc/rc.conf`
+3. Enable the service in `/etc/rc.conf` and make it executable
 ```
 # echo '# Enable TTRSS-Update-daemon' >> /etc/rc.conf
 # echo 'ttrss_enable="YES"' >> /etc/rc.conf
