@@ -92,7 +92,6 @@ ttrss_cleanup()
 	if [ -f ${ttrss_dir}/lock/update_daemon.lock ]; then
 		rm -rf ${ttrss_dir}/lock/update_daemon*.lock
 	fi
-	echo "RC-TTRSS: All done"
 }
 
 load_rc_config ${name}
