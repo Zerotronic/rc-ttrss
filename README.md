@@ -45,7 +45,7 @@ Goodbye!
 # chmod 755 /usr/local/etc/rc.d/ttrss && chmod ug+x /usr/local/etc/rc.d/ttrss
 ```
 
-3. Enable the service in `/etc/rc.conf` and make it executable
+3. Enable the service in `/etc/rc.conf`
 ```
 # echo '# Enable TTRSS-Update-daemon' >> /etc/rc.conf
 # echo 'ttrss_enable="YES"' >> /etc/rc.conf
