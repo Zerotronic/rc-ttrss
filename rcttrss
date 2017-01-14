@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# PROVIDE: ttrss
+# PROVIDE: rcttrss
 # REQUIRE: NETWORKING
 # REQUIRE: DAEMON mysql
 # BEFORE: LOGIN
@@ -33,7 +33,7 @@
 
 . /etc/rc.subr
 
-name=ttrss
+name=rcttrss
 rcvar=`set_rcvar`
 phpexec=`which php`
 start_precmd="${name}_prestart"
@@ -41,53 +41,53 @@ start_cmd="${name}_start"
 stop_cmd="${name}_stopcmd"
 stop_postcmd="${name}_cleanup"
 
-: ${ttrss_user:="root"}
-: ${ttrss_cmd_user:="ttrss"}
+: ${rcttrss_user:="root"}
+: ${rcttrss_cmd_user:="ttrss"}
 : ${ttrss_dir:="/usr/local/www/apache24/data/tt-rss"}
-: ${ttrss_pid:="/var/run/ttrss.pid"}
-: ${ttrss_log:="/var/log/ttrss-log"}
-: ${ttrss_enable:="NO"}
+: ${rcttrss_pid:="/var/run/rcttrss.pid"}
+: ${rcttrss_log:="/var/log/rcttrss-log"}
+: ${rcttrss_enable:="NO"}
 
 command_args=${ttrss_dir}/update_daemon2.php
 command=/usr/sbin/daemon
 procname=${name}
-pidfile=${ttrss_pid}
+pidfile=${rcttrss_pid}
 required_files="${ttrss_dir}/update_daemon2.php"
 
-ttrss_prestart()
+rcttrss_prestart()
 {
-	touch ${ttrss_log} && chown ${ttrss_cmd_user} ${ttrss_log}
-	touch ${ttrss_pid} && chown ${ttrss_cmd_user} ${ttrss_pid}
+	touch ${rcttrss_log} && chown ${rcttrss_cmd_user} ${rcttrss_log}
+	touch ${rcttrss_pid} && chown ${rcttrss_cmd_user} ${rcttrss_pid}
 }
 
-ttrss_start()
+rcttrss_start()
 {
-	echo "Starting ttrss-update-daemon"
-	exec ${command} -c -t ${name} -P ${ttrss_pid} -u ${ttrss_cmd_user} ${phpexec} ${command_args} > ${ttrss_log}
+	echo "Starting rcttrss update daemon"
+	exec ${command} -c -t ${name} -P ${rcttrss_pid} -u ${rcttrss_cmd_user} ${phpexec} ${command_args} > ${rcttrss_log}
 }
 
-ttrss_stopcmd()
+rcttrss_stopcmd()
 {
-	if [ -f "${ttrss_pid}" ] && (pgrep -F ${ttrss_pid} daemon > /dev/null); then
-		main_pid=$(cat ${ttrss_pid});
+	if [ -f "${rcttrss_pid}" ] && (pgrep -F ${rcttrss_pid} daemon > /dev/null); then
+		main_pid=$(cat ${rcttrss_pid});
 		child_pids=$(pgrep -P ${main_pid});
 		grandchild_pids=$(pgrep -P ${child_pids});
 		all_pids="${main_pid} ${child_pids}";
 		all_pids_with_grandchildren="${main_pid} ${child_pids} ${grandchild_pids}";
 		kill ${all_pids};
 		wait_for_pids ${all_pids_with_grandchildren};
-		rm -rf ${ttrss_pid};
+		rm -rf ${rcttrss_pid};
 	else
 		echo "${name} is not running.";
 		exit 1;
 	fi
 }
 
-ttrss_cleanup()
+rcttrss_cleanup()
 {
-	echo "Cleaning up after ttrss-update-daemon..."
-	if [ -f ${ttrss_pid} ]; then
-		rm -rf ${ttrss_pid}
+	echo "Cleaning up after RC-TTRSS update daemon..."
+	if [ -f ${rcttrss_pid} ]; then
+		rm -rf ${rcttrss_pid}
 	fi
 	if [ -f ${ttrss_dir}/lock/update_daemon.lock ]; then
 		rm -rf ${ttrss_dir}/lock/update_daemon*.lock
