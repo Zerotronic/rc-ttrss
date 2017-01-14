@@ -1,13 +1,13 @@
-# rc-ttrss
+# rcttrss
 A TTRSS-Update-Daemon RC script for FreeBSD
 
 ## How to use:
 
-1. Create a user to run the tt-rss update daemon (eg. ttrss) and invite him to the apache group (eg. www)
+1. Create a user to run the rcttrss update daemon (eg. ttrss) and invite him to the apache group (eg. www)
 ```
 # adduser
 Username: ttrss
-Full name: TTRSS Update Daemon User
+Full name: RCTTRSS Update Daemon User
 Uid (Leave empty for default):
 Login group [ttrss]:
 Login group is ttrss. Invite ttrss into other groups? []: www
@@ -23,7 +23,7 @@ Enter password again:
 Lock out the account after creation? [no]:
 Username   : ttrss
 Password   : ****
-Full Name  : TTRSS Update Daemon User
+Full Name  : RCTTRSS Update Daemon User
 Uid        : 1002
 Class      :
 Groups     : ttrss www
@@ -37,21 +37,21 @@ Goodbye!
 #
 ```
 
-2. Download `ttrss` file and move it to your `/usr/local/etc/rc.d/` folder
+2. Download `rcttrss` file and move it to your `/usr/local/etc/rc.d/` folder
 ```
-# fetch https://github.com/Zerotronic/rc-ttrss/raw/master/ttrss
-# mv ttrss /usr/local/etc/rc.d/
-# chown root:wheel /usr/local/etc/rc.d/ttrss
-# chmod 755 /usr/local/etc/rc.d/ttrss && chmod ug+x /usr/local/etc/rc.d/ttrss
+# fetch https://github.com/Zerotronic/rc-ttrss/raw/master/rcttrss
+# mv rcttrss /usr/local/etc/rc.d/
+# chown root:wheel /usr/local/etc/rc.d/rcttrss
+# chmod 555 /usr/local/etc/rc.d/rcttrss && chmod ug+x /usr/local/etc/rc.d/rcttrss
 ```
 
 3. Enable the service in `/etc/rc.conf`
 ```
-# echo '# Enable TTRSS-Update-daemon' >> /etc/rc.conf
-# echo 'ttrss_enable="YES"' >> /etc/rc.conf
+# echo '# Enable RCTTRSS-Update-daemon' >> /etc/rc.conf
+# echo 'rcttrss_enable="YES"' >> /etc/rc.conf
 ```
 
 4. Start the service
 ```
-# service ttrss start
+# service rcttrss start
 ```
