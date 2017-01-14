@@ -52,7 +52,7 @@ command_args=${ttrss_dir}/update_daemon2.php
 command=/usr/sbin/daemon
 procname=${name}
 pidfile=${rcttrss_pid}
-required_files="${ttrss_dir}/update_daemon2.php"
+required_files="${ttrss_dir}/update_daemon2.php ${ttrss_dir}/config.php"
 
 rcttrss_prestart()
 {
