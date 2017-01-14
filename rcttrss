@@ -85,7 +85,7 @@ rcttrss_stopcmd()
 
 rcttrss_cleanup()
 {
-	echo "Cleaning up after RC-TTRSS update daemon..."
+	echo "Cleaning up after rcttrss update daemon..."
 	if [ -f ${rcttrss_pid} ]; then
 		rm -rf ${rcttrss_pid}
 	fi
