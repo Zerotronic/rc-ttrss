@@ -36,7 +36,7 @@
 name=rcttrss
 rcvar=`set_rcvar`
 phpexec=`which php`
-start_precmd="${name}_prestart"
+status_cmd="${name}_status"
 start_cmd="${name}_start"
 stop_cmd="${name}_stopcmd"
 stop_postcmd="${name}_cleanup"
@@ -54,28 +54,67 @@ procname=${name}
 pidfile=${rcttrss_pid}
 required_files="${ttrss_dir}/update_daemon2.php ${ttrss_dir}/update.php ${ttrss_dir}/config.php"
 
-rcttrss_prestart()
+rcttrss_isrunning()
 {
-	touch ${rcttrss_log} && chown ${rcttrss_cmd_user} ${rcttrss_log}
-	touch ${rcttrss_pid} && chown ${rcttrss_cmd_user} ${rcttrss_pid}
+	if [ -f "${rcttrss_pid}" ] && (pgrep -F ${rcttrss_pid} daemon > /dev/null); then
+		return 0
+	else
+		return 1
+	fi
+}
+
+rcttrss_returnpids()
+{
+	if rcttrss_isrunning; then
+		main_pid=$(cat ${rcttrss_pid});
+		child_pids=$(pgrep -P ${main_pid});
+                grandchild_pids=$(pgrep -P ${child_pids});
+		all_pids="${main_pid} ${child_pids}";
+		all_pids_with_grandchildren="${main_pid} ${child_pids} ${grandchild_pids}";
+		case "$1" in
+			main)
+				echo ${main_pid}
+				;;
+			child)
+				echo ${child_pids}
+				;;
+			grandchild)
+				echo ${grandchild_pids}
+				;;
+			all)
+				echo ${all_pids}
+				;;
+			allplus)
+				echo ${all_pids_with_grandchildren}
+				;;
+			*)
+				exit 1
+				;;
+		esac
+	else
+		exit 1
+	fi
+}
+
+rcttrss_status()
+{
+	if rcttrss_isrunning; then echo "${name} is running as $(rcttrss_returnpids main)."; else echo "${name} not running?"; fi
 }
 
 rcttrss_start()
 {
+	[ -x ${phpexec} ] || (echo "${phpexec} not found"; exit 1)
 	echo "Starting rcttrss update daemon"
 	exec ${command} -c -t ${name} -P ${rcttrss_pid} -u ${rcttrss_cmd_user} ${phpexec} ${command_args} > ${rcttrss_log}
 }
 
 rcttrss_stopcmd()
 {
-	if [ -f "${rcttrss_pid}" ] && (pgrep -F ${rcttrss_pid} daemon > /dev/null); then
-		main_pid=$(cat ${rcttrss_pid});
-		child_pids=$(pgrep -P ${main_pid});
-		grandchild_pids=$(pgrep -P ${child_pids});
-		all_pids="${main_pid} ${child_pids}";
-		all_pids_with_grandchildren="${main_pid} ${child_pids} ${grandchild_pids}";
-		kill ${all_pids};
-		wait_for_pids ${all_pids_with_grandchildren};
+	if rcttrss_isrunning; then
+		tobekilled=$(rcttrss_returnpids all)
+		towaitfor=$(rcttrss_returnpids allplus)
+		kill ${tobekilled};
+		wait_for_pids ${towaitfor};
 		rm -rf ${rcttrss_pid};
 	else
 		echo "${name} is not running.";
