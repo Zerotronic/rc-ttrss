@@ -68,6 +68,11 @@ rcttrss_isrunning()
 rcttrss_returnpids()
 {
 	if rcttrss_isrunning; then
+		local main_pid
+		local child_pids
+		local grandchild_pids
+		local all_pids
+		local all_pids_with_grandchildren
 		main_pid=$(cat ${rcttrss_pid});
 		child_pids=$(pgrep -P ${main_pid});
                 grandchild_pids=$(pgrep -P ${child_pids});
@@ -114,6 +119,8 @@ rcttrss_start()
 rcttrss_stopcmd()
 {
 	if rcttrss_isrunning; then
+		local tobekilled
+		local towaitfor
 		tobekilled=$(rcttrss_returnpids all);
 		towaitfor=$(rcttrss_returnpids allplus);
 		kill ${tobekilled};
@@ -128,6 +135,7 @@ rcttrss_stopcmd()
 rcttrss_stopnow()
 {
 	if rcttrss_isrunning; then
+		local tokill
 		tokill=$(rcttrss_returnpids allplus);
 		kill -9 ${tokill};
 		wait_for_pids ${tokill};
