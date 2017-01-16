@@ -2,7 +2,7 @@
 
 # PROVIDE: rcttrss
 # REQUIRE: NETWORKING
-# REQUIRE: DAEMON mysql
+# REQUIRE: DAEMON mysql postgresql
 # BEFORE: LOGIN
 # KEYWORD: shutdown
 
@@ -39,6 +39,7 @@ phpexec=`which php`
 status_cmd="${name}_status"
 start_cmd="${name}_start"
 stop_cmd="${name}_stopcmd"
+stopnow_cmd="${name}_stopnow"
 stop_postcmd="${name}_cleanup"
 
 : ${rcttrss_user:="root"}
@@ -53,6 +54,7 @@ command=/usr/sbin/daemon
 procname=${name}
 pidfile=${rcttrss_pid}
 required_files="${ttrss_dir}/update_daemon2.php ${ttrss_dir}/update.php ${ttrss_dir}/config.php"
+extra_commands="stopnow"
 
 rcttrss_isrunning()
 {
@@ -98,27 +100,41 @@ rcttrss_returnpids()
 
 rcttrss_status()
 {
-	if rcttrss_isrunning; then echo "${name} is running as $(rcttrss_returnpids main)."; else echo "${name} not running?"; fi
+	if rcttrss_isrunning; then echo "${name} is running as pid $(rcttrss_returnpids main)."; else echo "${name} is not running."; fi
 }
 
 rcttrss_start()
 {
-	[ -x ${phpexec} ] || (echo "${phpexec} not found"; exit 1)
-	echo "Starting rcttrss update daemon"
+	if [ ! -x ${phpexec} ]; then echo "${phpexec} not found or not executable."; exit 1; fi
+	if rcttrss_isrunning; then echo "${name} is already running as pid $(rcttrss_returnpids main)."; exit 1; fi
+	echo "Starting rcttrss update daemon."
 	exec ${command} -c -t ${name} -P ${rcttrss_pid} -u ${rcttrss_cmd_user} ${phpexec} ${command_args} > ${rcttrss_log}
 }
 
 rcttrss_stopcmd()
 {
 	if rcttrss_isrunning; then
-		tobekilled=$(rcttrss_returnpids all)
-		towaitfor=$(rcttrss_returnpids allplus)
+		tobekilled=$(rcttrss_returnpids all);
+		towaitfor=$(rcttrss_returnpids allplus);
 		kill ${tobekilled};
 		wait_for_pids ${towaitfor};
 		rm -rf ${rcttrss_pid};
 	else
 		echo "${name} is not running.";
 		exit 1;
+	fi
+}
+
+rcttrss_stopnow()
+{
+	if rcttrss_isrunning; then
+		tokill=$(rcttrss_returnpids allplus);
+		kill -9 ${tokill};
+		wait_for_pids ${tokill};
+		rcttrss_cleanup;
+	else
+		echo "${name} is not running.";
+                exit 1;
 	fi
 }
 
