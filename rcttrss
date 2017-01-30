@@ -2,7 +2,7 @@
 
 # PROVIDE: rcttrss
 # REQUIRE: NETWORKING
-# REQUIRE: DAEMON mysql postgresql
+# REQUIRE: DAEMON mysql
 # BEFORE: LOGIN
 # KEYWORD: shutdown
 
@@ -36,7 +36,9 @@
 name=rcttrss
 rcvar=`set_rcvar`
 phpexec=`which php`
+mysqladm="/usr/local/bin/mysqladmin"
 status_cmd="${name}_status"
+start_precmd="${name}_prestart"
 start_cmd="${name}_start"
 stop_cmd="${name}_stopcmd"
 stopnow_cmd="${name}_stopnow"
@@ -44,10 +46,13 @@ stop_postcmd="${name}_cleanup"
 
 : ${rcttrss_user:="root"}
 : ${rcttrss_cmd_user:="ttrss"}
+: ${ttrss_db_user:="ttrss-usr"}
 : ${ttrss_dir:="/usr/local/www/apache24/data/tt-rss"}
 : ${rcttrss_pid:="/var/run/rcttrss.pid"}
 : ${rcttrss_log:="/var/log/rcttrss-log"}
+: ${db_connect_retries:=3}
 : ${rcttrss_enable:="NO"}
+: ${rcttrss_local_db:="YES"}
 
 command_args=${ttrss_dir}/update_daemon2.php
 command=/usr/sbin/daemon
@@ -106,6 +111,33 @@ rcttrss_returnpids()
 rcttrss_status()
 {
 	if rcttrss_isrunning; then echo "${name} is running as pid $(rcttrss_returnpids main)."; else echo "${name} is not running."; fi
+}
+
+rcttrss_dbstatus()
+{
+	local dbcheck
+	local status
+	if [ ! -x ${mysqladm} ]; then echo "mysqladmin not found or not executable."; exit 1; fi
+	dbcheck="${mysqladm} -u ${ttrss_db_user} ping"
+	$dbcheck > /dev/null 2>&1
+	status=$?
+	return $status
+}
+
+rcttrss_prestart()
+{
+	if checkyesno rcttrss_local_db; then
+		local count
+		count=1
+		while true;
+		do
+			if rcttrss_dbstatus; then return 0; fi
+			if [ $count -gt $db_connect_retries ]; then echo "rcttrss: MySQL db not responding."; exit 1; fi
+			echo "rcttrss: MySQL not ready. Retrying in 5 seconds";
+			count=$(( $count + 1 ))
+			sleep 5
+		done
+	fi
 }
 
 rcttrss_start()
