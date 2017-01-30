@@ -53,7 +53,7 @@ Goodbye!
 
 4. If your MySQL database is not local (i.e. on the same machine) then do the following
 ```
-# echo 'rcttrss_local_db="YES"' >> /etc/rc.conf
+# echo 'rcttrss_local_db="NO"' >> /etc/rc.conf
 ```
 
 5. Make folders needed by tt-rss update_daemon2.php writable
