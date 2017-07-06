@@ -51,7 +51,7 @@ Goodbye!
 # echo 'rcttrss_enable="YES"' >> /etc/rc.conf
 ```
 
-4. If your MySQL database is not local (i.e. on the same machine) then do the following
+4. If your tt-rss Database is not local (i.e. on the same machine) then do the following
 ```
 # echo 'rcttrss_local_db="NO"' >> /etc/rc.conf
 ```
