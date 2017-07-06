@@ -110,7 +110,7 @@ rcttrss_returnpids()
 
 rcttrss_status()
 {
-	if rcttrss_isrunning; then echo "${name} is running as pid $(rcttrss_returnpids main)."; else echo "${name} is not running."; fi
+	if rcttrss_isrunning; then echo "${name} is running as pid $(rcttrss_returnpids main), with child pids $(rcttrss_returnpids child) and grandchild pids $(rcttrss_returnpids grandchild)."; else echo "${name} is not running."; fi
 }
 
 rcttrss_dbstatus()
