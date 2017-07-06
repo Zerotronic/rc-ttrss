@@ -110,7 +110,17 @@ rcttrss_returnpids()
 
 rcttrss_status()
 {
-	if rcttrss_isrunning; then echo "${name} is running as pid $(rcttrss_returnpids main), with child pids $(rcttrss_returnpids child) and grandchild pids $(rcttrss_returnpids grandchild)."; else echo "${name} is not running."; fi
+	local grchld
+	if rcttrss_isrunning; then
+		if [ ! -z "$(rcttrss_returnpids grandchild)" ]; then
+			grchld="and grandchild pids $(rcttrss_returnpids grandchild)";
+		else
+			grchld="";
+		fi
+		echo "${name} is running as pid $(rcttrss_returnpids main), with child pids $(rcttrss_returnpids child) $grchld"; 
+	else 
+		echo "${name} is not running." ;
+	fi
 }
 
 rcttrss_dbstatus()
