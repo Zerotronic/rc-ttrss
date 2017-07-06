@@ -83,6 +83,6 @@ Goodbye!
 # service rcttrss start   (Will start the service)
 # service rcttrss stop    (Will gracefully stop the service, i.e. wait for all the pids to return after collecting their data)
 # service rcttrss stopnow (Will SIGKILL the service and all the pids regardless if they were in the middle of a task)
-# service rcttrss status  (Will return running status and pid of the service)
+# service rcttrss status  (Will return running status and pid of the service as well as child and grandchild pids)
 # service rcttrss restart (Will gracefully restart the service)
 ```
