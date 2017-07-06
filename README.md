@@ -56,7 +56,9 @@ Goodbye!
 # echo 'rcttrss_local_db="NO"' >> /etc/rc.conf
 ```
 
-5. Make folders needed by tt-rss update_daemon2.php writable
+5. Open rcttrss file with an editor and check that all the parameters are correct for your tt-rss installation. (e.g. ttrss_dir is the path where your tt-rss installation lives. rcttrss_db_type is the type of database your tt-rss installation uses, mysql or postgresql, etc.)
+
+6. Make folders needed by tt-rss update_daemon2.php writable
 ```
 # chmod -R 777 [tt-rss_dir]/cache/images
 # chmod -R 777 [tt-rss_dir]/cache/upload
@@ -66,12 +68,12 @@ Goodbye!
 # chmod -R 777 [tt-rss_dir]/lock
 ```
 
-6. The update daemon of tt-rss requires that the php executable is in /usr/bin so if it is not there create a symbolic link
+7. The update daemon of tt-rss requires that the php executable is in /usr/bin so if it is not there create a symbolic link
 ```
 # ln -s /usr/local/bin/php /usr/bin/php
 ```
 
-7. Start the service
+8. Start the service
 ```
 # service rcttrss start
 ```
