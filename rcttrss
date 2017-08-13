@@ -166,7 +166,7 @@ rcttrss_start()
 	if [ ! -x ${phpexec} ]; then echo "${phpexec} not found or not executable."; exit 1; fi
 	if rcttrss_isrunning; then echo "${name} is already running as pid $(rcttrss_returnpids main)."; exit 1; fi
 	echo "Starting rcttrss update daemon."
-	exec ${command} -c -t ${name} -P ${rcttrss_pid} -u ${rcttrss_cmd_user} ${phpexec} ${command_args} > ${rcttrss_log}
+	exec ${command} -c -t ${name} -P ${rcttrss_pid} -u ${rcttrss_cmd_user} -o ${rcttrss_log} ${phpexec} ${command_args}
 }
 
 rcttrss_stopcmd()
