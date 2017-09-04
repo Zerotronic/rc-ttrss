@@ -60,12 +60,12 @@ Goodbye!
 
 6. Make folders needed by tt-rss update_daemon2.php writable
 ```
-# chmod -R 777 [tt-rss_dir]/cache/images
-# chmod -R 777 [tt-rss_dir]/cache/upload
-# chmod -R 777 [tt-rss_dir]/cache/export
-# chmod -R 777 [tt-rss_dir]/cache/js
-# chmod -R 777 [tt-rss_dir]/feed-icons
-# chmod -R 777 [tt-rss_dir]/lock
+# chmod -R 775 [tt-rss_dir]/cache/images
+# chmod -R 775 [tt-rss_dir]/cache/upload
+# chmod -R 775 [tt-rss_dir]/cache/export
+# chmod -R 775 [tt-rss_dir]/cache/js
+# chmod -R 775 [tt-rss_dir]/feed-icons
+# chmod -R 775 [tt-rss_dir]/lock
 ```
 
 7. The update daemon of tt-rss requires that the php executable is in /usr/bin so if it is not there create a symbolic link
